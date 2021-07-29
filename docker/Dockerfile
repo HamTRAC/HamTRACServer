@@ -52,3 +52,5 @@ RUN wget -c https://github.com/Tencent/rapidjson/archive/refs/heads/master.tar.g
     && cmake --build build/ --target clean \
     && ldconfig \
     && cd ..
+
+WORKDIR /root/dev

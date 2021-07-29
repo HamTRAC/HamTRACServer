@@ -1,23 +1,23 @@
 
 # import deploy config
 # You can change the default deploy config with `make cnf="deploy_special.env" release`
-dpl ?= deploy.env
+dpl ?= docker/deploy.env
 include $(dpl)
 export $(shell sed 's/=.*//' $(dpl))
 
 # grep the version from the mix file
-VERSION=$(shell ./version.sh)
+VERSION=$(shell docker/version.sh)
 
 # DOCKER TASKS
 # Build the container
 build: ## Build the container
-	docker build -t $(APP_NAME) .
+	docker build -t $(APP_NAME) docker
 
 build-nc: ## Build the container without caching
-	docker build --no-cache -t $(APP_NAME) .
+	docker build --no-cache -t $(APP_NAME) docker
 
 run: ## Run container on port configured in `config.env`
-	docker run -i -t --rm --name="$(APP_NAME)" $(APP_NAME)
+	docker run -v ${PWD}:/root/dev -i -t --rm --name="$(APP_NAME)" $(APP_NAME)
 
 stop: ## Stop and remove a running container
 	docker stop $(APP_NAME); docker rm $(APP_NAME)
