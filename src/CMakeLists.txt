@@ -1,6 +1,6 @@
 
-add_executable(${CMAKE_PROJECT_NAME}
+ADD_EXECUTABLE(${CMAKE_PROJECT_NAME}
     main.cpp
 )
 
-#target_link_libraries(${CMAKE_PROJECT_NAME})
+TARGET_LINK_LIBRARIES(${CMAKE_PROJECT_NAME} paho-mqttpp3 paho-mqtt3a)
