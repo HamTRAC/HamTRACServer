@@ -13,7 +13,7 @@ using namespace rapidjson;
 
 void json_example() {
   const char *json = "{\"project\":\"rapidjson\",\"stars\":10}";
-  Document d;
+  Document    d;
   d.Parse(json);
 
   // 2. Modify it by DOM.
@@ -21,7 +21,7 @@ void json_example() {
   s.SetInt(s.GetInt() + 1);
 
   // 3. Stringify the DOM
-  StringBuffer buffer;
+  StringBuffer         buffer;
   Writer<StringBuffer> writer(buffer);
   d.Accept(writer);
 
@@ -51,13 +51,12 @@ class sample_mem_persistence : virtual public mqtt::iclient_persistence {
   std::map<std::string, std::string> store_;
 
 public:
-  sample_mem_persistence() : open_(false) {}
+  sample_mem_persistence() : open_(false) {
+  }
 
   // "Open" the store
-  void open(const std::string &clientId,
-            const std::string &serverURI) override {
-    std::cout << "[Opening persistence store for '" << clientId << "' at '"
-              << serverURI << "']" << std::endl;
+  void open(const std::string &clientId, const std::string &serverURI) override {
+    std::cout << "[Opening persistence store for '" << clientId << "' at '" << serverURI << "']" << std::endl;
     open_ = true;
   }
 
@@ -87,8 +86,7 @@ public:
   }
 
   // Puts the specified data into the persistent store.
-  void put(const std::string &key,
-           const std::vector<mqtt::string_view> &bufs) override {
+  void put(const std::string &key, const std::vector<mqtt::string_view> &bufs) override {
     std::cout << "[Persisting data with key '" << key << "']" << std::endl;
     std::string str;
     for (const auto &b : bufs)
@@ -102,8 +100,7 @@ public:
     auto p = store_.find(key);
     if (p == store_.end())
       throw mqtt::persistence_exception();
-    std::cout << "[Found persistence data for key '" << key << "']"
-              << std::endl;
+    std::cout << "[Found persistence data for key '" << key << "']" << std::endl;
 
     return p->second;
   }
@@ -127,15 +124,14 @@ class user_callback : public virtual mqtt::callback {
   }
 
   void delivery_complete(mqtt::delivery_token_ptr tok) override {
-    std::cout << "\n\t[Delivery complete for token: "
-              << (tok ? tok->get_message_id() : -1) << "]" << std::endl;
+    std::cout << "\n\t[Delivery complete for token: " << (tok ? tok->get_message_id() : -1) << "]" << std::endl;
   }
 };
 
 void mqtt_example() {
   std::cout << "Initialzing..." << std::endl;
   sample_mem_persistence persist;
-  mqtt::client client(SERVER_ADDRESS, CLIENT_ID, &persist);
+  mqtt::client           client(SERVER_ADDRESS, CLIENT_ID, &persist);
 
   user_callback cb;
   client.set_callback(cb);
@@ -177,8 +173,7 @@ void mqtt_example() {
     client.disconnect();
     std::cout << "...OK" << std::endl;
   } catch (const mqtt::persistence_exception &exc) {
-    std::cerr << "Persistence Error: " << exc.what() << " ["
-              << exc.get_reason_code() << "]" << std::endl;
+    std::cerr << "Persistence Error: " << exc.what() << " [" << exc.get_reason_code() << "]" << std::endl;
   } catch (const mqtt::exception &exc) {
     std::cerr << exc.what() << std::endl;
   }
