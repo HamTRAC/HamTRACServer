@@ -1,9 +1,6 @@
 
-# import deploy config
-# You can change the default deploy config with `make cnf="deploy_special.env" release`
-dpl ?= docker/deploy.env
-include $(dpl)
-export $(shell sed 's/=.*//' $(dpl))
+DOCKER_REPO=ghcr.io/hamtrac
+APP_NAME=hamtracserver
 
 # grep the version from the mix file
 VERSION=$(shell docker/version.sh)
@@ -11,16 +8,19 @@ VERSION=$(shell docker/version.sh)
 # DOCKER TASKS
 # Build the container
 build: ## Build the container
-	docker build -t $(APP_NAME) docker
+	docker build --target production -t $(APP_NAME) .
 
 build-nc: ## Build the container without caching
-	docker build --no-cache -t $(APP_NAME) docker
+	docker build --no-cache --target production -t $(APP_NAME) .
 
-run: ## Run container on port configured in `config.env`
-	docker run -v ${PWD}:/root/dev -i -t --rm --name="$(APP_NAME)" $(APP_NAME)
+build-dev: ## Build the container
+	docker build --target develop -t $(APP_NAME):develop .
 
-stop: ## Stop and remove a running container
-	docker stop $(APP_NAME); docker rm $(APP_NAME)
+run:
+	docker run --rm $(APP_NAME)
+
+run-dev: ## Run container on port configured in `config.env`
+	docker run -v ${PWD}:/root/HamTRACServer -it --rm --name="$(APP_NAME)" $(APP_NAME):develop
 
 release: build-nc publish
 
@@ -40,7 +40,7 @@ tag: tag-latest tag-version ## Generate container tags for the `{version}` ans `
 
 tag-latest: ## Generate container `{version}` tag
 	@echo 'create tag latest'
-	docker tag $(APP_NAME) $(DOCKER_REPO)/$(APP_NAME):latest
+	docker tag $(APP_NAME) $(APP_NAME):latest
 
 tag-version: ## Generate container `latest` tag
 	@echo 'create tag $(VERSION)'
