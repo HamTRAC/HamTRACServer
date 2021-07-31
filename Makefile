@@ -16,6 +16,9 @@ build-nc: ## Build the container without caching
 build-dev: ## Build the container
 	docker build --target develop -t $(APP_NAME):develop .
 
+build-build: ## Build the container
+	docker build --target builder -t $(APP_NAME):build .
+
 run:
 	docker run --rm $(APP_NAME)
 
@@ -25,7 +28,7 @@ run-dev: ## Run container on port configured in `config.env`
 release: build-nc publish
 
 # Docker publish
-publish: publish-latest publish-version ## Publish the `{version}` ans `latest` tagged containers to ECR
+publish: publish-latest # publish-version ## Publish the `{version}` ans `latest` tagged containers to ECR
 
 publish-latest: tag-latest ## Publish the `latest` taged container to ECR
 	@echo 'publish latest to $(DOCKER_REPO)'
