@@ -1,0 +1,39 @@
+name: Integreation Tests
+
+push:
+  branches:
+    - main
+
+jobs:
+  build:
+    name: Compile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: build first (develop) docker image
+        run: make build-dev
+      - name: compile code
+        run: make build-build
+      - name: build production docker image
+        run: make build
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: publish production docker image
+        run: make publish 
+
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run clang-format style check for C/C++ programs.
+        uses: jidicula/clang-format-action@v3.2.0
+        with:
+          clang-format-version: '11'
+          check-path: src
